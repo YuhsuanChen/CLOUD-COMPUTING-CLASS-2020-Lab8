@@ -2,6 +2,7 @@
 Step 1: obtain the last 100 images from the URL entered
 We think it will be interested to see the Instagram hashtag #dreamdestination and discover what's the essential element of people's ideal vacation as they are various.
 <p align="center"><img src="./img/dreamdestination.png" width="70%" height="70%" alt="Top15_labels"/></p>
+
 ```
 from selenium import webdriver
 import time
@@ -49,7 +50,9 @@ driver.close()
 
 
 Step 2-4
+<p align="center"><img src="./img/Process_API.png" width="70%" height="70%" alt="Processing"/></p>
 <p align="center"><img src="./img/Top15_labels.png" width="70%" height="70%" alt="Top15_labels"/></p>
+
 ```
 label_scorePair = {}
 label_count = []
@@ -120,6 +123,7 @@ if __name__ == '__main__':
 
 # [END run_application]
 ```
+
 ## Q82: How long have you been working on this session? What have been the main difficulties you have faced and how have you solved them?
 Approximately 5 hours, did not encounter difficulties when using cloud service but mainly about download the pictures from URL. At first, I tried to download the twitter pictures by tweepy; however, that’s more complicated than I think, especially I was trying to focus on just one hashtag. Then I try to use the expression we learn from the previous lab to scrape and download the pictures from google search and Instagram with selenium and chromedriver ( a tool that allows chrome to act automatically) it worked fine. 
 
