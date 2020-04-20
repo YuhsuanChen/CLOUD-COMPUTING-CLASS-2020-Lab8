@@ -50,7 +50,7 @@ driver.close()
 
 
 Step 2-4
-<p align="center"><img src="./img/Process_API.png" width="70%" height="70%" alt="Processing"/></p>
+<p align="center"><img src="./img/Process_API.png" width="40%" height="40%" alt="Processing"/></p>
 <p align="center"><img src="./img/Top15_labels.png" width="70%" height="70%" alt="Top15_labels"/></p>
 
 ```
