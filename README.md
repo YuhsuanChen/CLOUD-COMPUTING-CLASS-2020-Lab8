@@ -128,16 +128,24 @@ if __name__ == '__main__':
 # [END run_application]
 ```
 ### B: Reddit
-Using Reddit's REST APIs, we scraped the subreddit 'earthporn' community of landscape photographers and those who appreciate the natural beauty of our home planet.
+Using Reddit's REST APIs, we scraped the subreddit 'earthporn' which is a community of landscape photographers and those who appreciate the natural beauty of our home planet.
+
 The code below consists of a function 'get_posts' which scrapes any given subreddit based on a few parameters including count and another function 'print_hist' which displays a histogram of most commonly occuring words in the label annotation from the Vision API. We used another function for leveraging the landmark detection feature of the Google API and obtained landmark features very accurately predicted by the API. Apart from the confidence score, the API also provides geo-locations including boundingPoly vertices which can easily be absorbed by a GIS system. 
 
 
 <p align="center"><img src="./img/subreddit.png" alt="Images"/></p>
 
+As in the description of the subreddit, the pictures mainly consist of surreal landscapes.
+
 <p align="center"><img src="./img/cvlabels.png"  alt="Image Labels"/></p>
+
+The most commonly occuring label is the 'Sky', evidently since most of the pictures contain a horizon and the sky is a prominent aspect. Other prominent labels are 'Nature','Mountainous landforms','Trees' and 'Water'. It woudld interesting to correlate these with the number of upvotes the post recieve to understand the reaction of viewers with respect to different aspects of a picture. 
 
 <p align="center"><img src="./img/cvresponse.png" alt="CV Response"/></p>
 
+The response in the above snipped is from the Landmark detection feature. Even though it has a low confidence score, the landmark has been accurately predicted. Apart from the confidence score, the API also provides geo-locations including boundingPoly vertices which can easily be absorbed by a GIS system. It would be interesting to plot these landmarks over a map and create a heatmap based on the number of upvotes any particular image recieved.
+
+Below is the code used to accomplish all 4 steps of the task in section 8.3.4 of the lab assigment.
 
 ```
 import os, requests
@@ -228,12 +236,7 @@ class SubredditScraper:
 
         print(f'Collecting information from r/{self.sub}.')
         for post in subreddit:
-
-            # Check if post.id is in df and set to True if df is empty.
-            # This way new posts are still added to dictionary when df = ''
             unique_id = post.id not in tuple(df.id) if csv_loaded else True
-
-            # Save any unique, non-stickied posts with descriptions to sub_dict.
             if ((post.url[-4]) == f'.') and ('redd' == post.url.split('.')[1]):
                 if unique_id:
                     sub_dict['title'].append(post.title)
@@ -284,9 +287,7 @@ class SubredditScraper:
         #lengths = {key: len(value) for key, value in sub_dict.items()}
         #print(lengths)
         new_df = pd.DataFrame(sub_dict)
-
-        #Add new_df to df if df exists then save it to a csv.
-        if 'DataFrame' in str(type(df)) and self.mode == 'w':
+       if 'DataFrame' in str(type(df)) and self.mode == 'w':
             pd.concat([df, new_df], axis=0, sort=0).to_csv(csv, index=False)
             print(
                 f'{len(new_df)} new posts collected and added to {csv}')
@@ -305,7 +306,7 @@ if __name__ == '__main__':
 ```
 
 ## Q82: How long have you been working on this session? What have been the main difficulties you have faced and how have you solved them?
-Approximately 5 hours, did not encounter difficulties when using cloud service but mainly about download the pictures from URL. At first, I tried to download the twitter pictures by tweepy; however, that’s more complicated than I think, especially I was trying to focus on just one hashtag. Then I try to use the expression we learn from the previous lab to scrape and download the pictures from google search and Instagram with selenium and chromedriver ( a tool that allows chrome to act automatically) it worked fine. 
+Approximately 6 hours, did not encounter difficulties when using cloud service but mainly about download the pictures from URL. At first, I tried to download the twitter pictures by tweepy; however, that’s more complicated than I think, especially I was trying to focus on just one hashtag. Then I try to use the expression we learn from the previous lab to scrape and download the pictures from google search and Instagram with selenium and chromedriver ( a tool that allows chrome to act automatically) it worked fine. 
 
 
 
