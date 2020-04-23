@@ -1,7 +1,7 @@
 ## Q81: What problems have you found developing this section? How did you solve them? 
-We did two different runs of this task on Instagram (using Selenium driver) and Reddit (using Reddit APIs)
+We did two different runs of this task on Instagram (using Selenium driver) and Reddit (using Reddit APIs):
 
-### Instagram 
+### A. Instagram 
 Step 1: obtain the last 100 images from the URL entered
 We think it will be interested to see the Instagram hashtag #dreamdestination and discover what's the essential element of people's ideal vacation as they are various.
 <p align="center"><img src="./img/dreamdestination.png" width="70%" height="70%" alt="Top15_labels"/></p>
@@ -127,11 +127,173 @@ if __name__ == '__main__':
 
 # [END run_application]
 ```
-### Reddit
-
+### B: Reddit
+Using Reddit's REST APIs, we scraped the subreddit 'earthporn' community of landscape photographers and those who appreciate the natural beauty of our home planet.
+The code below consists of a function 'get_posts' which scrapes any given subreddit based on a few parameters including count and another function 'print_hist' which displays a histogram of most commonly occuring words in the label annotation from the Vision API. We used another function for leveraging the landmark detection feature of the Google API and obtained landmark features very accurately predicted by the API. Apart from the confidence score, the API also provides geo-locations including boundingPoly vertices which can easily be absorbed by a GIS system. 
 
 ```
-code
+import os, requests
+from os.path import isfile
+import praw
+import pandas as pd
+from time import sleep
+import operator
+import matplotlib.pyplot as plt
+from collections import Counter
+import glob
+import label, landmark
+
+
+# Get credentials from DEFAULT instance in praw.ini
+reddit = praw.Reddit()
+download_folder = os.environ['download_loc']
+
+
+class SubredditScraper:
+
+    def __init__(self, sub, sort='new', lim=100, mode='w'):
+        self.sub = sub
+        self.sort = sort
+        self.lim = lim
+        self.mode = mode
+
+        print(
+            f'SubredditScraper instance created with values '
+            f'sub = {sub}, sort = {sort}, lim = {lim}, mode = {mode}')
+
+    def set_sort(self):
+        if self.sort == 'new':
+            return self.sort, reddit.subreddit(self.sub).new(limit=self.lim)
+        elif self.sort == 'top':
+            return self.sort, reddit.subreddit(self.sub).top(limit=self.lim)
+        elif self.sort == 'hot':
+            return self.sort, reddit.subreddit(self.sub).hot(limit=self.lim)
+        else:
+            self.sort = 'hot'
+            print('Sort method was not recognized, defaulting to hot.')
+            return self.sort, reddit.subreddit(self.sub).hot(limit=self.lim)
+
+    def print_hist(self, dict,keys):
+        label_scorePair = {x: dict[x] for x in keys}
+        print(label_scorePair['label_1'])
+
+        # [START: create_plot: Top 10 labels]
+        value_x = Counter(label_scorePair['label_1']).keys()
+        value_y=Counter(label_scorePair['label_1']).values()
+        print(value_x)
+        print(value_y)
+        #value_y.pop(i99)
+        # value_x = []
+        # value_y = []
+
+        # for i in label_count:
+        #     value_x.append(i[0])
+        #     value_y.append(i[1])
+        plt.bar(range(len(value_x)), value_y, width=0.75, align='center')
+        plt.xticks(range(len(value_x)), value_x, rotation=90)
+        plt.axis('auto')
+        plt.show()
+        plt.savefig('Top_15_label.png')
+        plt.close()
+        # [END create_plot]
+
+    def get_posts(self):
+        """Get unique posts from a specified subreddit."""
+
+        sub_dict = {
+            'title': [], 'url': [], 'id': [], 'sorted_by': [],
+            'num_comments': [], 'score': [], 'ups': [], 'downs': [], 'label_1': [], 'lab_score_1': [],
+             'label_2': [], 'lab_score_2': [], 'label_3': [], 'lab_score_3': [],
+            # 'label_4': [], 'lab_score_4': [], 'label_5': [], 'lab_score_5': [],
+            'landmark': [], 'land_score': []}
+
+        csv = f'new_{self.sub}_posts.csv'
+
+        # Attempt to specify a sorting method.
+        sort, subreddit = self.set_sort()
+
+        df, csv_loaded = (pd.read_csv(csv), 1) if isfile(csv) else ('', 0)
+
+        print(f'csv = {csv}')
+        print(f'After set_sort(), sort = {sort} and sub = {self.sub}')
+        print(f'csv_loaded = {csv_loaded}')
+
+        print(f'Collecting information from r/{self.sub}.')
+        for post in subreddit:
+
+            # Check if post.id is in df and set to True if df is empty.
+            # This way new posts are still added to dictionary when df = ''
+            unique_id = post.id not in tuple(df.id) if csv_loaded else True
+
+            # Save any unique, non-stickied posts with descriptions to sub_dict.
+            if ((post.url[-4]) == f'.') and ('redd' == post.url.split('.')[1]):
+                if unique_id:
+                    sub_dict['title'].append(post.title)
+                    sub_dict['url'].append(post.url)
+                    sub_dict['id'].append(post.id)
+                    sub_dict['sorted_by'].append(sort)
+                    sub_dict['num_comments'].append(post.num_comments)
+                    sub_dict['score'].append(post.score)
+                    sub_dict['ups'].append(post.ups)
+                    sub_dict['downs'].append(post.downs)
+                    # print(post.url)
+                    with open(download_folder + 'reddit-img-' + post.id + '.jpg', 'wb') as out_file:
+                        print(
+                            'saving image as' + download_folder + 'reddit-img-' + post.id + '.jpg ' + 'from address: ',
+                            post.url)
+                        r = requests.get(post.url)
+                        out_file.write(r.content)
+                        for filename in glob.glob(download_folder + 'reddit-img-' + post.id + '.jpg'):
+                            if os.stat(filename).st_size < 10485760/1.5:
+                                labels = label.main(filename, 3)
+                                i = 1
+                                for results in labels:
+                                    sub_dict['label_' + str(i)].append(results['description'])
+                                    sub_dict['lab_score_' + str(i)].append(results['score'])
+                                    i += 1
+                                try:
+                                    landmarks = landmark.main(filename)
+                                    sub_dict['landmark'].append(landmarks['description'])
+                                    sub_dict['land_score'].append(landmarks['score'])
+                                except:
+                                    sub_dict['landmark'].append("None")
+                                    sub_dict['land_score'].append(0)
+                            else:
+                                sub_dict['label_1'].append("99")
+                                sub_dict['lab_score_1'].append(99)
+                                sub_dict['label_2'].append("99")
+                                sub_dict['lab_score_2'].append(99)
+                                sub_dict['label_3'].append("99")
+                                sub_dict['lab_score_3'].append(99)
+                                # sub_dict['label_4'].append("99")
+                                # sub_dict['lab_score_4'].append(99)
+                                # sub_dict['label_4'].append("99")
+                                # sub_dict['lab_score_5'].append(99)
+                                sub_dict['landmark'].append("99")
+                                sub_dict['land_score'].append(99)
+
+                    sleep(0.1)
+        #lengths = {key: len(value) for key, value in sub_dict.items()}
+        #print(lengths)
+        new_df = pd.DataFrame(sub_dict)
+
+        #Add new_df to df if df exists then save it to a csv.
+        if 'DataFrame' in str(type(df)) and self.mode == 'w':
+            pd.concat([df, new_df], axis=0, sort=0).to_csv(csv, index=False)
+            print(
+                f'{len(new_df)} new posts collected and added to {csv}')
+        elif self.mode == 'w':
+            new_df.to_csv(csv, index=False)
+            print(f'{len(new_df)} posts collected and saved to {csv}')
+        else:
+            print(
+                f'{len(new_df)} posts were collected but they were not '
+                f'added to {csv} because mode was set to "{self.mode}"')
+        self.print_hist(sub_dict,['label_1', 'lab_score_1'])
+
+if __name__ == '__main__':
+    SubredditScraper('earthporn', lim=50, mode='w', sort='top').get_posts()
+
 ```
 
 ## Q82: How long have you been working on this session? What have been the main difficulties you have faced and how have you solved them?
