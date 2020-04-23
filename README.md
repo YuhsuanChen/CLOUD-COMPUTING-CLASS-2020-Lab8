@@ -103,7 +103,7 @@ if __name__ == '__main__':
        print("----------------Image " + str(i) + "----------------")
        main(photo)
 
-   # [START: create_plot: Top 10 labels]
+   # [START: create_plot: Top 15 labels]
    for key, value in label_scorePair.items():
        label_count.append((key, len(value)))  # label and number of appear time
    label_count = sorted(label_count, key=itemgetter(1), reverse=True)[:15]  # sort the output
@@ -119,6 +119,7 @@ if __name__ == '__main__':
    plt.axis('tight')
    plt.show()
    plt.savefig('Top_15_label.png')
+   plt.close()
    # [END create_plot]
 
 # [END run_application]
