@@ -132,11 +132,11 @@ Using Reddit's REST APIs, we scraped the subreddit 'earthporn' community of land
 The code below consists of a function 'get_posts' which scrapes any given subreddit based on a few parameters including count and another function 'print_hist' which displays a histogram of most commonly occuring words in the label annotation from the Vision API. We used another function for leveraging the landmark detection feature of the Google API and obtained landmark features very accurately predicted by the API. Apart from the confidence score, the API also provides geo-locations including boundingPoly vertices which can easily be absorbed by a GIS system. 
 
 
-<p align="center"><img src="./img/subreddit.png" width="40%" height="40%" alt="Images"/></p>
+<p align="center"><img src="./img/subreddit.png" alt="Images"/></p>
 
-<p align="center"><img src="./img/cvlabels.png" width="40%" height="40%" alt="Image Labels"/></p>
+<p align="center"><img src="./img/cvlabels.png"  alt="Image Labels"/></p>
 
-<p align="center"><img src="./img/cvresponse.png" width="40%" height="40%" alt="CV Response"/></p>
+<p align="center"><img src="./img/cvresponse.png" alt="CV Response"/></p>
 
 
 ```
