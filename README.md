@@ -1,7 +1,7 @@
 ## Q81: What problems have you found developing this section? How did you solve them? 
 We did two different runs of this task on Instagram (using Selenium driver) and Reddit (using Reddit APIs)
 
-# Instagram 
+### Instagram 
 Step 1: obtain the last 100 images from the URL entered
 We think it will be interested to see the Instagram hashtag #dreamdestination and discover what's the essential element of people's ideal vacation as they are various.
 <p align="center"><img src="./img/dreamdestination.png" width="70%" height="70%" alt="Top15_labels"/></p>
@@ -126,6 +126,12 @@ if __name__ == '__main__':
    # [END create_plot]
 
 # [END run_application]
+```
+### Reddit
+
+
+```
+code
 ```
 
 ## Q82: How long have you been working on this session? What have been the main difficulties you have faced and how have you solved them?
