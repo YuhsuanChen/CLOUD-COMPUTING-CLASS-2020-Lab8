@@ -143,7 +143,10 @@ The most commonly occuring label is the 'Sky', evidently since most of the pictu
 
 <p align="center"><img src="./img/cvresponse.png" alt="CV Response"/></p>
 
-The response in the above snipped is from the Landmark detection feature. Even though it has a low confidence score, the landmark has been accurately predicted. Apart from the confidence score, the API also provides geo-locations including boundingPoly vertices which can easily be absorbed by a GIS system. It would be interesting to plot these landmarks over a map and create a heatmap based on the number of upvotes any particular image recieved.
+The response in the above snipped is from the Landmark detection feature. Even though it has a low confidence score, the landmark has been accurately predicted (image of 'Mt Hood National Park' as shown below). Apart from the confidence score, the API also provides geo-locations including boundingPoly vertices which can easily be absorbed by a GIS system. It would be interesting to plot these landmarks over a map and create a heatmap based on the number of upvotes any particular image recieved.
+
+<p align="center"><img src="./img/mthood.jpg" width="50%" height="50%" alt="Mt. Hood National Park"/></p>
+
 
 Below is the code used to accomplish all 4 steps of the task in section 8.3.4 of the lab assigment.
 
